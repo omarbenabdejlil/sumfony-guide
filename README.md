@@ -155,3 +155,55 @@ security:
         ]);
     }
 ```
+> Make login Form with validation : 
+- Create 2 root for `connexion` et `déconnecion` :
+```php
+/**
+     * @Route("/connexion", name="security_login")
+     */
+    public function login() {
+        return $this->render('security/login.html.twig');
+    }
+
+    /**
+     * @Route("/deconnexion", name="security_logout")
+     */
+    public function logout() {}
+```    
+
+- Add some config to `security.yaml` : 
+```php
+security:
+    encoders:
+        App\Entity\User:
+            algorithm: bcrypt
+
+    # https://symfony.com/doc/current/security.html#where-do-users-come-from-user-providers
+    providers:
+        users_in_memory: { memory: null }
+        in_database:
+            entity:
+                class: App\Entity\User
+                property: email
+    firewalls:
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+        main:
+            anonymous: true
+            lazy: true
+            provider: in_database
+            
+            form_login:
+                login_path: security_login
+                check_path: security_login
+
+            logout:
+                path: security_logout
+                target: blog
+                
+                //
+                   access_control:
+        # - { path: ^/admin, roles: ROLE_ADMIN }
+        # - { path: ^/profile, roles: ROLE_USER }
+```                
